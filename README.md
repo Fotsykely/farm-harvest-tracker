@@ -136,7 +136,7 @@ Branche `mysql` du template : le projet reste en `net10.0`, mais les paquets EF 
 `next.config.ts` active `cacheComponents` et `partialPrefetching`. Conséquences :
 
 - **Toute lecture de l'API doit être sous une frontière `<Suspense>`.** Le `loading.tsx` racine couvre les pages de premier niveau, mais pas une navigation client vers une route imbriquée. Chaque page affiche donc son titre tout de suite et lit `searchParams` / `params` puis appelle l'API dans un composant enfant, dans son propre `<Suspense>`. Sans cela, `next dev` affiche *« encountered uncached data during prerendering or a navigation »*.
-- **`new Date()` se lit après `await searchParams`**, jamais avant : sinon `next build` échoue (« unstable value `new Date()` while prerendering »). C'est pour cela que la date du jour est lue dans le composant enfant, une fois la requête connue.
+- **La date du jour se lit via `lib/today.ts`** (`await connection()` puis `new Date()`), jamais directement : en `next dev` comme en `next build`, `new Date()` dans le rendu d'une page échoue (« unstable value `new Date()` while prerendering »), même après `await searchParams`.
 - **`usePathname()` (le menu) doit être sous `<Suspense>`** : `components/main-nav.tsx` affiche d'abord les liens sans section active, puis marque la section courante.
 - `params` et `searchParams` sont des promesses : `await props.params`.
 - `error.tsx` reçoit la prop `retry` (et non `reset`).
