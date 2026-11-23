@@ -2,7 +2,7 @@ import "server-only";
 import type { FieldErrors } from "./types";
 
 // The only place that talks HTTP to the ASP.NET Core API. Pages and Server Actions call the
-// functions of projects.ts and tasks.ts and never see fetch or status codes.
+// functions of plots.ts, harvests.ts and results.ts and never see fetch or status codes.
 
 const REQUEST_TIMEOUT_MS = 5000;
 
@@ -17,6 +17,15 @@ export class ApiNotFoundError extends Error {
   constructor() {
     super("The requested resource does not exist.");
     this.name = "ApiNotFoundError";
+  }
+}
+
+// 409: the request is valid but clashes with existing data (an entry already exists for this plot and month).
+// The message comes from the API (ProblemDetails.detail) and is written for the user.
+export class ApiConflictError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ApiConflictError";
   }
 }
 
@@ -45,8 +54,14 @@ async function sendRequest(path: string, init: RequestInit): Promise<Response> {
 
   if (response.ok) return response;
   if (response.status === 404) throw new ApiNotFoundError();
+  if (response.status === 409) throw new ApiConflictError(await readConflictMessage(response));
   if (response.status === 400) throw new ApiValidationError(await readFieldErrors(response));
   throw new Error(`The API answered with status ${response.status}.`);
+}
+
+async function readConflictMessage(response: Response): Promise<string> {
+  const problem = (await response.json().catch(() => null)) as { detail?: string } | null;
+  return problem?.detail ?? "Cette donnée existe déjà.";
 }
 
 function apiUrl(path: string): string {

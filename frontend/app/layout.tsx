@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import Link from "next/link";
+import { MainNav } from "@/components/main-nav";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -8,7 +9,6 @@ const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
 });
 
-// Replace the application name here and in the header below.
 export const metadata: Metadata = {
   title: { default: "Récoltes de la coopérative", template: "%s · Récoltes de la coopérative" },
   description: "Suivi mensuel des récoltes de riz, maïs et manioc par parcelle.",
@@ -25,10 +25,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Aller au contenu
         </a>
         <header className="border-b border-border bg-surface">
-          <div className="mx-auto flex w-full max-w-3xl items-center px-4 py-3">
+          <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-2">
             <Link href="/" className="text-lg font-semibold">
               Récoltes de la coopérative
             </Link>
+            <MainNav />
           </div>
         </header>
         <main id="main-content" className="mx-auto w-full max-w-3xl px-4 py-6 lg:py-10">
