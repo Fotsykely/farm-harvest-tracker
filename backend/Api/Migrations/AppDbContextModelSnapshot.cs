@@ -22,7 +22,7 @@ namespace Api.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("Api.Entities.Item", b =>
+            modelBuilder.Entity("Api.Entities.Harvest", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,28 +30,102 @@ namespace Api.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("CassavaKg")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
+                    b.Property<decimal>("MaizeKg")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
+                    b.Property<int>("PlotId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("RiceKg")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Items");
+                    b.HasIndex("PlotId", "Year", "Month")
+                        .IsUnique();
+
+                    b.ToTable("Harvests");
+                });
+
+            modelBuilder.Entity("Api.Entities.Plot", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Plots");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Parcelle Nord"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Parcelle Sud"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Verger"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Potager"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Colline"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Bas-fond"
+                        });
+                });
+
+            modelBuilder.Entity("Api.Entities.Harvest", b =>
+                {
+                    b.HasOne("Api.Entities.Plot", "Plot")
+                        .WithMany()
+                        .HasForeignKey("PlotId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Plot");
                 });
 #pragma warning restore 612, 618
         }
