@@ -5,6 +5,7 @@ import { PeriodPicker } from "@/components/period-picker";
 import { listHarvests } from "@/lib/api-client/harvests";
 import { listPlots } from "@/lib/api-client/plots";
 import { parsePeriod, periodLabel } from "@/lib/period";
+import { currentDate } from "@/lib/today";
 import { PlotRow } from "./_components/plot-row";
 
 export const metadata: Metadata = { title: "Parcelles" };
@@ -27,9 +28,7 @@ export default function PlotsPage(props: PageProps<"/">) {
 
 async function PlotsContent({ searchParams }: { searchParams: PageProps<"/">["searchParams"] }) {
   const query = await searchParams;
-  // The current date is read after the request data (searchParams): before it, Next refuses `new Date()`
-  // because the value would be frozen in the prerendered page.
-  const today = new Date();
+  const today = await currentDate();
   const period = parsePeriod(query, today);
   const [plots, harvests] = await Promise.all([listPlots(), listHarvests(period)]);
   const harvestByPlot = new Map(harvests.map((harvest) => [harvest.plotId, harvest]));

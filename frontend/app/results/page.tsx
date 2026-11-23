@@ -5,6 +5,7 @@ import { PeriodPicker } from "@/components/period-picker";
 import { getResults } from "@/lib/api-client/results";
 import { formatQuantity } from "@/lib/format";
 import { parsePeriod, periodLabel } from "@/lib/period";
+import { currentDate } from "@/lib/today";
 
 export const metadata: Metadata = { title: "Résultat" };
 
@@ -21,7 +22,7 @@ export default function ResultsPage(props: PageProps<"/results">) {
 
 async function ResultsContent({ searchParams }: { searchParams: PageProps<"/results">["searchParams"] }) {
   const query = await searchParams;
-  const today = new Date(); // after the request data, see app/page.tsx
+  const today = await currentDate();
   const period = parsePeriod(query, today);
   // The API does the calculation and the sort: the page only displays the rows in the order received.
   const results = await getResults(period);

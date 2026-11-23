@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { HarvestForm } from "@/components/harvest-form";
 import { listPlots } from "@/lib/api-client/plots";
 import { parsePeriod, periodLabel, periodQuery } from "@/lib/period";
+import { currentDate } from "@/lib/today";
 import { createHarvestAction } from "../actions";
 
 export const metadata: Metadata = { title: "Nouvelle saisie" };
@@ -22,7 +23,7 @@ export default function NewHarvestPage(props: PageProps<"/harvests/new">) {
 
 async function NewHarvestForm({ searchParams }: { searchParams: PageProps<"/harvests/new">["searchParams"] }) {
   const query = await searchParams;
-  const period = parsePeriod(query, new Date());
+  const period = parsePeriod(query, await currentDate());
   const plots = await listPlots();
   const plot = plots.find((candidate) => String(candidate.id) === query.plotId);
   if (!plot) notFound();

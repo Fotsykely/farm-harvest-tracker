@@ -5,6 +5,7 @@ import { ListSkeleton } from "@/components/list-skeleton";
 import { PeriodPicker } from "@/components/period-picker";
 import { listHarvests } from "@/lib/api-client/harvests";
 import { parsePeriod, periodLabel } from "@/lib/period";
+import { currentDate } from "@/lib/today";
 import { HarvestRow } from "../_components/harvest-row";
 
 export const metadata: Metadata = { title: "Saisies" };
@@ -22,7 +23,7 @@ export default function HarvestsPage(props: PageProps<"/harvests">) {
 
 async function HarvestsContent({ searchParams }: { searchParams: PageProps<"/harvests">["searchParams"] }) {
   const query = await searchParams;
-  const today = new Date(); // after the request data, see app/page.tsx
+  const today = await currentDate();
   const period = parsePeriod(query, today);
   const harvests = await listHarvests(period);
 
